@@ -1,0 +1,67 @@
+version: 1.0.1
+token: 1234567890:YOUR-BOT-TOKEN-FROM-BOT-FATHER
+###############################################################
+##   List of chats to which notifications will be sent       ##
+##                                                           ##
+##   Context:                                                ##
+##   > First specify the ip                                  ##
+##   > Come up with a name yourself                          ##
+##   > Listen mark:                                          ##
+##      0 -- the addressee will be ignored                   ##
+##      1 -- the addressee receives the letters              ##
+###############################################################
+tg_chats:
+	- id: 123456789
+		name: Ivan # not necessarily required
+		listen: 1
+###############################################################
+##   List of ip addresses to check.                          ##
+##   Observe the order!                                      ##
+##                                                           ##
+##   Recommended:                                            ##
+##   > 1st is the ip of the local network, for example       ##
+##     a router. It is used to check access to the local net ##
+##   > 2nd preferably a well-known DNS server. It is used    ##
+##     to check Internet access                              ##
+##   > Then your domain names                                ##
+##                                                           ##
+##   Context:                                                ##
+##   > Come up with a name yourself                          ##
+##   > Stop mark:                                            ##
+##      0 -- if the ip is unavailable, the monitoring        ##
+##        service will continue to work                      ##
+##      1 -- after the ip is unavailable, the monitoring     ##
+##        service will stop checking                         ##
+###############################################################
+ips:
+	- ip: 192.168.0.1
+    name: local network
+    stop: 1
+  - ip: 8.8.8.8
+    name: google dns
+    stop: 1
+  - ip: 192.168.0.123
+    name: your server ip
+    stop: 0
+  - ip: 123.123.123.123
+    name: yous host
+    stop: 0
+###############################################################
+##   In the curl section, list the domain names of the sites ##
+##                                                           ##
+##   > States:                                               ##
+##      0 -- ignored                                         ##
+##      1 -- active                                          ##
+##   > Come up with a name yourself                          ##
+##   > Set the normal request code for the host              ##
+##   > Stop mark:                                            ##
+##      0 -- if domain is unavailable, the monitoring        ##
+##        service will continue to work                      ##
+##      1 -- after domain is unavailable, the monitoring     ##
+##        service will stop checking                         ##
+###############################################################
+domains:
+  - domain: domain.org
+    name: your domain
+    http_normal_code: 200
+		stop: 0
