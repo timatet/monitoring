@@ -6,9 +6,6 @@ import subprocess
 import yaml
 import logging
 
-username = os.environ['MY_USER']
-password = os.environ['MY_PASS']
-
 CONFIG_FILE = 'config.yml'
 logging.basicConfig(
     filename='monitoring.log', 
