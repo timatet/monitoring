@@ -1,5 +1,9 @@
-version: 1.0.1
+version: 1.0.2
 token: 1234567890:YOUR-BOT-TOKEN-FROM-BOT-FATHER
+##############################################################
+##   Waiting time between requests in seconds               ##
+##############################################################
+await_time: 2
 ###############################################################
 ##   List of chats to which notifications will be sent       ##
 ##                                                           ##
@@ -44,7 +48,7 @@ ips:
     name: your server ip
     stop: 0
   - ip: 123.123.123.123
-    name: yous host
+    name: your host
     stop: 0
 ###############################################################
 ##   In the curl section, list the domain names of the sites ##

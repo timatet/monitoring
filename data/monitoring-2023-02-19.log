@@ -1,0 +1,5 @@
+02/19/2023 11:07:45PM INFO	:: A new session has been started. Service version: 1.0.2
+02/19/2023 11:07:45PM DEBUG	:: Starting new HTTPS connection (1): api.telegram.org:443
+02/19/2023 11:07:45PM INFO	:: Checking...
+02/19/2023 11:07:48PM INFO	:: host.name : mydomain.ru, host.otval_cnt : 0, prev_hosts_down : 0, cur_hosts_down : 1
+02/19/2023 11:08:02PM INFO	:: mydomain.ru is unavailable
