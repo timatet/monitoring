@@ -125,6 +125,7 @@ def monitoring() :
                     delta = str(datetime.datetime.now() - host.otval_date)
                     for addresat in addr_list:
                         bot.send_message(addresat, f"{host.name} was unavailable for " + delta.split(".")[0])
+                        current_logstate = log_statuses.NEW
                     host.otval_date = ""
                 except:
                     logging.error("JOPA")
