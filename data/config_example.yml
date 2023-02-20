@@ -1,6 +1,15 @@
 version: 1.0.2
 token: 1234567890:YOUR-BOT-TOKEN-FROM-BOT-FATHER
 ##############################################################
+##   Set whether extended logging is necessary.             ##
+##   Extended logging - logs each check.                    ##
+##                                                          ##
+##   Context:                                               ##
+##   > True   -- Skips duplicate logger messages            ##
+##   > False  -- Logs every action                          ##
+##############################################################
+log_important: False
+######################################bu########################
 ##   Waiting time between requests in seconds               ##
 ##############################################################
 await_time: 2
