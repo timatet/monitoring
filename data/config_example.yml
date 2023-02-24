@@ -1,4 +1,6 @@
-version: 1.0.2
+##############################################################
+##   Specify the current telegram token of your bot.        ##
+##############################################################
 token: 1234567890:YOUR-BOT-TOKEN-FROM-BOT-FATHER
 ##############################################################
 ##   Set whether extended logging is necessary.             ##
@@ -20,13 +22,13 @@ await_time: 2
 ##   > First specify the ip                                  ##
 ##   > Come up with a name yourself                          ##
 ##   > Listen mark:                                          ##
-##      0 -- the addressee will be ignored                   ##
-##      1 -- the addressee receives the letters              ##
+##      False -- the addressee will be ignored               ##
+##      True  -- the addressee receives the letters          ##
 ###############################################################
 tg_chats:
 	- id: 123456789
 		name: Ivan # not necessarily required
-		listen: 1
+		listen: True
 ###############################################################
 ##   List of ip addresses to check.                          ##
 ##   Observe the order!                                      ##
@@ -45,20 +47,29 @@ tg_chats:
 ##        service will continue to work                      ##
 ##      1 -- after the ip is unavailable, the monitoring     ##
 ##        service will stop checking                         ##
+##   > Notify:                                               ##
+##      True  -- You will receive notifications about        ##
+##        errors related to this host                        ##
+##      False -- You will NOT receive notifications about    ##
+##        errors related to this host.                       ##
 ###############################################################
 ips:
 	- ip: 192.168.0.1
     name: local network
     stop: 1
+    notify: False
   - ip: 8.8.8.8
     name: google dns
     stop: 1
+    notify: True
   - ip: 192.168.0.123
     name: your server ip
     stop: 0
+    notify: True
   - ip: 123.123.123.123
     name: your host
     stop: 0
+    notify: True
 ###############################################################
 ##   In the curl section, list the domain names of the sites ##
 ##                                                           ##
@@ -72,9 +83,15 @@ ips:
 ##        service will continue to work                      ##
 ##      1 -- after domain is unavailable, the monitoring     ##
 ##        service will stop checking                         ##
+##   > Notify:                                               ##
+##      True  -- You will receive notifications about        ##
+##        errors related to this host                        ##
+##      False -- You will NOT receive notifications about    ##
+##        errors related to this host.                       ##
 ###############################################################
 domains:
   - domain: domain.org
     name: your domain
     http_normal_code: 200
 		stop: 0
+    notify: True

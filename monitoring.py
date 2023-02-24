@@ -5,9 +5,15 @@ import datetime
 import subprocess
 import globals
 import loggings
+
+class Addresat(object) :
+    def __init__(self, chat_id : str, name : str, listen : bool):
+        self.chat_id = chat_id
+        self.name = name
+        self.listen = listen
     
 class Host(object) :
-    def __init__(self, name : str, address : str, check_method : str, http_code : str, stop_after : bool):
+    def __init__(self, name : str, address : str, check_method : str, http_code : str, stop_after : bool, notify : bool):
         self.name = name
         self.address = address
         self.check_method = check_method
@@ -15,6 +21,7 @@ class Host(object) :
         self.otval_date = ""
         self.otval_cnt = 0
         self.stop_after = stop_after
+        self.notify = notify
     
     def check(self) -> bool :
         if self.check_method == "curl" :
@@ -35,10 +42,11 @@ keep_logging = True
 
 def get_receivers() :    
     for tg_chat in globals.CONF_TG_CHATS:
-        if tg_chat['listen'] == 1:
-            addr_list.append(
-                tg_chat['id']
-            )  
+        addr_list.append(Addresat(
+            chat_id  = tg_chat['id'],
+            name     = tg_chat['name'],
+            listen   = tg_chat['listen']
+        ))  
 
 def get_hosts() :
     for ip in globals.CONF_IPS:     
@@ -47,7 +55,8 @@ def get_hosts() :
             address      = ip['ip'],
             check_method = "ping",
             http_code    = "",
-            stop_after   = ip['stop'] == 1
+            stop_after   = ip['stop'] == 1,
+            notify       = ip['notify']
         ))
     
     for domain in globals.CONF_DOMAINS:
@@ -56,14 +65,14 @@ def get_hosts() :
             address      = domain['domain'],
             check_method = "curl",
             http_code    = domain['http_normal_code'],
-            stop_after   = domain['stop'] == 1
+            stop_after   = domain['stop'] == 1,
+            notify       = domain['notify']
         ))
 
 def monitoring() :
     global prev_hosts_down
     global cur_hosts_down
     global keep_logging
-
     
     if keep_logging:
         loggings.info(f"Checking...")
@@ -81,10 +90,12 @@ def monitoring() :
             if (host.otval_date == "") :
                 host.otval_date = datetime.datetime.now()
                 try:
-                    loggings.info(f"{host.name} is unavailable")
+                    msg = f"{host.name} is unavailable"
+                    loggings.info(msg)
                     keep_logging = True
                     for addresat in addr_list:
-                        bot.send_message(addresat, f"{host.name} is unavailable")
+                        if host.notify and addresat.listen:
+                            bot.send_message(addresat.chat_id, msg)
                 except:
                     loggings.error("JOPA")
                     keep_logging = True
@@ -98,8 +109,11 @@ def monitoring() :
             if (host.otval_date != "") :
                 try:
                     delta = str(datetime.datetime.now() - host.otval_date)
+                    msg = f"{host.name} was unavailable for " + delta.split(".")[0]
+                    loggings.info(msg)
                     for addresat in addr_list:
-                        bot.send_message(addresat, f"{host.name} was unavailable for " + delta.split(".")[0])
+                        if host.notify and addresat.listen:
+                            bot.send_message(addresat.chat_id, msg)
                         keep_logging = True
                     host.otval_date = ""
                 except:
@@ -111,8 +125,22 @@ def monitoring() :
 get_receivers() 
 get_hosts()
 loggings.configure_logger()
+
+hello_msg = ''
+if globals.IS_NEWVERSION:
+    hello_msg = f'''
+    
+Service update! New version is *v{globals.CONF_VERSION}*.
+{globals.LAST_UPDATES}
+_We send the file with the current configuration below:_
+'''
+    
 for addresat in addr_list:
-    bot.send_message(addresat, "Monitoring started")
+    if addresat.listen:
+        bot.send_message(addresat.chat_id, f"Hi, *{addresat.name}*! Monitoring started! {hello_msg}", parse_mode="Markdown")
+        if globals.IS_NEWVERSION:
+            bot.send_document(addresat.chat_id, open(globals.CONFIG_FILE,"rb"))
+loggings.info(f'Monitoring started for TG addresats {[(addresat.name, addresat.chat_id) for addresat in addr_list if addresat.listen]}')
 
 while(True) :
     monitoring()
