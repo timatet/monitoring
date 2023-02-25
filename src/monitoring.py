@@ -1,6 +1,5 @@
 import os
 from time import sleep
-import telebot
 import datetime
 import subprocess
 import globals
@@ -32,8 +31,7 @@ class Host(object) :
 
 ### Defining local variables
 loggings.info(f"A new session has been started. Service version: {globals.CONF_VERSION}")
-await_time  = globals.CONF_AWAIT_TIME
-bot         = telebot.TeleBot(globals.CONF_TOKEN)
+
 addr_list   = []
 hosts_list  = []
 prev_hosts_down = 0
@@ -95,7 +93,7 @@ def monitoring() :
                     keep_logging = True
                     for addresat in addr_list:
                         if host.notify and addresat.listen:
-                            bot.send_message(addresat.chat_id, msg)
+                            globals.TELEBOT.send_message(addresat.chat_id, msg)
                 except:
                     loggings.error("JOPA")
                     keep_logging = True
@@ -113,7 +111,7 @@ def monitoring() :
                     loggings.info(msg)
                     for addresat in addr_list:
                         if host.notify and addresat.listen:
-                            bot.send_message(addresat.chat_id, msg)
+                            globals.TELEBOT.send_message(addresat.chat_id, msg)
                         keep_logging = True
                     host.otval_date = ""
                 except:
@@ -137,12 +135,12 @@ _We send the file with the current configuration below:_
     
 for addresat in addr_list:
     if addresat.listen:
-        bot.send_message(addresat.chat_id, f"Hi, *{addresat.name}*! Monitoring started! {hello_msg}", parse_mode="Markdown")
+        globals.TELEBOT.send_message(addresat.chat_id, f"Hi, *{addresat.name}*! Monitoring started! {hello_msg}", parse_mode="Markdown")
         if globals.IS_NEWVERSION:
-            bot.send_document(addresat.chat_id, open(globals.CONFIG_FILE,"rb"))
+            globals.TELEBOT.send_document(addresat.chat_id, open(globals.CONFIG_FILE,"rb"))
 loggings.info(f'Monitoring started for TG addresats {[(addresat.name, addresat.chat_id) for addresat in addr_list if addresat.listen]}')
 
 while(True) :
     monitoring()
     loggings.check_dates()
-    sleep(await_time)
+    sleep(globals.CONF_AWAIT_TIME)

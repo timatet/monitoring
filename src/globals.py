@@ -2,13 +2,12 @@ import os
 from os import path
 import shutil
 import yaml
+import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.4'
+CONF_VERSION = '1.0.5'
 LAST_UPDATES = '''
-- Added the ability to disable hosts alerts
-- Notifications about new versions
-- Addressees' names and so on..
+- Support for /help and /ping. Check it!
 '''
 
 DATA_DIRECTORY = os.getenv('DATA_DIRECTORY', 'data')
@@ -51,3 +50,5 @@ CONF_AWAIT_TIME = config['await_time']
 CONF_TG_CHATS = config['tg_chats']
 CONF_IPS = config['ips']
 CONF_DOMAINS = config['domains']
+
+TELEBOT = telebot.TeleBot(CONF_TOKEN)

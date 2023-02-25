@@ -14,5 +14,6 @@ COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY ./data/config_example.yml config.yml
 # Copying and running the script itself
-COPY *.py ./
-CMD [ "python3", "monitoring.py"]
+COPY app.py app.py
+ADD ./src /app/src
+CMD [ "python3", "app.py"]
