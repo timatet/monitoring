@@ -5,9 +5,9 @@ import yaml
 import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.5'
+CONF_VERSION = '1.0.6'
 LAST_UPDATES = '''
-- Support for /help and /ping. Check it!
+- Disable support for /help and /ping. 
 '''
 
 DATA_DIRECTORY = os.getenv('DATA_DIRECTORY', 'data')
