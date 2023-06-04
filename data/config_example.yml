@@ -19,7 +19,7 @@ await_time: 2
 ## Set the correct delimiter for the time. Possible options ##
 ## in different systems: comma or dot                       ##
 ##############################################################
-delimiter: .
+delimiter: ','
 ###############################################################
 ##   List of chats to which notifications will be sent       ##
 ##                                                           ##
