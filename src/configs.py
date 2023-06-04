@@ -50,18 +50,20 @@ class Host :
         }
 
 def get_hosts(conf_host_objs, check_method) -> list :
-    hosts_list = [check_method]
-    for host in conf_host_objs:     
-        hosts_list.append(Host(
-            name         = host['name'],
-            host         = host['host'],
-            check_method = check_method,
-            http_normal_code    = host['http_normal_code'] if 'http_normal_code' in host else '',
-            stop_after   = host['stop_after'] == 1,
-            notify       = host['notify'],
-            priority     = host['priority']
-        ))
-    return hosts_list
+    hosts_list = []
+    if conf_host_objs != None and len(conf_host_objs) > 0:
+        for host in conf_host_objs:     
+            hosts_list.append(Host(
+                name         = host['name'],
+                host         = host['host'],
+                check_method = check_method,
+                http_normal_code = host['http_normal_code'] if 'http_normal_code' in host else '',
+                stop_after   = host['stop_after'] == 1,
+                notify       = host['notify'],
+                priority     = host['priority']
+            ))
+    sorted_by_priority = [check_method] + sorted(hosts_list, key=lambda x: x.priority, reverse=False)
+    return sorted_by_priority
 
 def get_receivers(conf_addr_objs) -> list :  
     addr_list = []  
@@ -105,6 +107,10 @@ def update_date():
     return time.ctime(os.path.getmtime(globals.CONFIG_FILE))
         
 def configure_config() :
+    global UPDATED
+    if UPDATED != '':
+        globals.read_config()
+    
     global ADDRESATES
     ADDRESATES = get_receivers(globals.CONF_TG_CHATS)
     
@@ -114,7 +120,6 @@ def configure_config() :
     global CURL_LIST
     CURL_LIST = get_hosts(globals.CONF_CURL, 'curl')
     
-    global UPDATED
     UPDATED = update_date()
     
 def check_config_update() :

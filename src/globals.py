@@ -16,16 +16,41 @@ CONFIG_FILE = f'{DATA_DIRECTORY}/{CONFIG_FILE_NAME}'
 FILE_VERSION = f'{DATA_DIRECTORY}/version'
 LOG_DIRECTORY = f'{DATA_DIRECTORY}/logs'
 
-### Reading the configuration file
-if path.isfile(CONFIG_FILE_NAME) and not path.isfile(CONFIG_FILE):
-     shutil.copyfile(CONFIG_FILE_NAME, CONFIG_FILE)
-try:
-    f = open(CONFIG_FILE, 'r')
-    config = yaml.load(f.read().replace('\t', '  '), Loader=yaml.FullLoader)
-    f.close()
-except:
-    print(f"Configuration file error: {CONFIG_FILE}")
-    exit(0)
+CONF_TOKEN = None
+CONF_LOG_IMPORTANT = None
+CONF_AWAIT_TIME = None
+CONF_TG_CHATS = None
+CONF_PING = None
+CONF_CURL = None
+CONF_DELIMITER = None
+
+config = ''
+def read_config() :
+    global config
+    
+    ### Reading the configuration file
+    if path.isfile(CONFIG_FILE_NAME) and not path.isfile(CONFIG_FILE):
+        shutil.copyfile(CONFIG_FILE_NAME, CONFIG_FILE)
+    try:
+        f = open(CONFIG_FILE, 'r')
+        config = yaml.load(f.read().replace('\t', '  '), Loader=yaml.FullLoader)
+        f.close()
+        
+        global CONF_TOKEN, CONF_LOG_IMPORTANT, CONF_AWAIT_TIME, CONF_TG_CHATS, CONF_PING, CONF_CURL, CONF_DELIMITER
+        CONF_TOKEN = config['token']
+        CONF_LOG_IMPORTANT = config['log_important']
+        CONF_AWAIT_TIME = config['await_time'] 
+        CONF_TG_CHATS = config['tg_chats']
+        CONF_PING = config['ping']
+        CONF_CURL = config['curl']
+        CONF_DELIMITER = config['delimiter']
+    except:
+        print(f"Configuration file error: {CONFIG_FILE}")
+        exit(0)
+
+read_config()
+
+
     
 ### Checking version
 IS_NEWVERSION = False
@@ -43,13 +68,5 @@ else:
         vers_file.truncate()
         IS_NEWVERSION = True
 vers_file.close()
-
-CONF_TOKEN = config['token']
-CONF_LOG_IMPORTANT = config['log_important']
-CONF_AWAIT_TIME = config['await_time'] 
-CONF_TG_CHATS = config['tg_chats']
-CONF_PING = config['ping']
-CONF_CURL = config['curl']
-CONF_DELIMITER = config['delimiter']
 
 TELEBOT = telebot.TeleBot(CONF_TOKEN)
