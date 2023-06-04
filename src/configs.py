@@ -1,4 +1,11 @@
-import os, subprocess, json, globals
+import os, subprocess, json, globals, time, loggings
+
+
+ADDRESATES = []
+PING_LIST = []
+CURL_LIST = []
+
+UPDATED = ''
 
 class Addresat :
     def __init__(self, id : str, name : str, listen : bool):
@@ -43,8 +50,7 @@ class Host :
         }
 
 def get_hosts(conf_host_objs, check_method) -> list :
-    hosts_list = []
-    hosts_list.append(check_method)
+    hosts_list = [check_method]
     for host in conf_host_objs:     
         hosts_list.append(Host(
             name         = host['name'],
@@ -94,3 +100,26 @@ class AppConfig :
             'ping': json.dumps(self.ping),
             'domains': json.dumps(self.domains)
         }
+        
+def update_date():
+    return time.ctime(os.path.getmtime(globals.CONFIG_FILE))
+        
+def configure_config() :
+    global ADDRESATES
+    ADDRESATES = get_receivers(globals.CONF_TG_CHATS)
+    
+    global PING_LIST
+    PING_LIST = get_hosts(globals.CONF_PING, 'ping')
+    
+    global CURL_LIST
+    CURL_LIST = get_hosts(globals.CONF_CURL, 'curl')
+    
+    global UPDATED
+    UPDATED = update_date()
+    
+def check_config_update() :
+    if UPDATED != update_date() :
+        configure_config()
+        loggings.info('Config updated.')
+        for addresat in ADDRESATES:
+            globals.TELEBOT.send_document(addresat.id, open(globals.CONFIG_FILE,"rb"), caption = 'Config updated.')
