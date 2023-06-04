@@ -4,77 +4,27 @@ import datetime
 import subprocess
 import globals
 import loggings
-
-class Addresat(object) :
-    def __init__(self, chat_id : str, name : str, listen : bool):
-        self.chat_id = chat_id
-        self.name = name
-        self.listen = listen
-    
-class Host(object) :
-    def __init__(self, name : str, address : str, check_method : str, http_code : str, stop_after : bool, notify : bool):
-        self.name = name
-        self.address = address
-        self.check_method = check_method
-        self.http_code = http_code
-        self.otval_date = ""
-        self.otval_cnt = 0
-        self.stop_after = stop_after
-        self.notify = notify
-    
-    def check(self) -> bool :
-        if self.check_method == "curl" :
-            received_http_code = subprocess.check_output(f"curl -skL -o /dev/null -w '%{{http_code}}' -m 1 {self.address} || echo ''", shell=True).decode('UTF-8')
-            return received_http_code == self.http_code
-        elif self.check_method == "ping" :
-            return os.system(f"ping -c 3 -W 0.1 -i 0.2 {self.address} >> /dev/null") == 0
+from configs import Addresat, get_hosts, get_receivers
 
 ### Defining local variables
 loggings.info(f"A new session has been started. Service version: {globals.CONF_VERSION}")
 
 addr_list   = []
-hosts_list  = []
+ping_list  = ['PING']
+curl_list  = ['CURL']
+
 prev_hosts_down = 0
 cur_hosts_down  = 0     
 keep_logging = True
 
-def get_receivers() :    
-    for tg_chat in globals.CONF_TG_CHATS:
-        addr_list.append(Addresat(
-            chat_id  = tg_chat['id'],
-            name     = tg_chat['name'],
-            listen   = tg_chat['listen']
-        ))  
-
-def get_hosts() :
-    for ip in globals.CONF_IPS:     
-        hosts_list.append(Host(
-            name         = ip['name'],
-            address      = ip['ip'],
-            check_method = "ping",
-            http_code    = "",
-            stop_after   = ip['stop'] == 1,
-            notify       = ip['notify']
-        ))
-    
-    for domain in globals.CONF_DOMAINS:
-        hosts_list.append(Host(
-            name         = domain['name'],
-            address      = domain['domain'],
-            check_method = "curl",
-            http_code    = domain['http_normal_code'],
-            stop_after   = domain['stop'] == 1,
-            notify       = domain['notify']
-        ))
-
-def monitoring() :
+def monitoring(hosts_list) :
     global prev_hosts_down
     global cur_hosts_down
     global keep_logging
     
     if keep_logging:
-        loggings.info(f"Checking...")
-    for host in hosts_list :
+        loggings.info(f"{hosts_list[0]}: Checking...")
+    for host in hosts_list[1:] :
         if (not host.check()) :
             cur_hosts_down += 1
             if keep_logging:
@@ -88,12 +38,12 @@ def monitoring() :
             if (host.otval_date == "") :
                 host.otval_date = datetime.datetime.now()
                 try:
-                    msg = f"{host.name} is unavailable"
+                    msg = f"{hosts_list[0]}: '{host.name}' is unavailable"
                     loggings.info(msg)
                     keep_logging = True
                     for addresat in addr_list:
                         if host.notify and addresat.listen:
-                            globals.TELEBOT.send_message(addresat.chat_id, msg)
+                            globals.TELEBOT.send_message(addresat.id, msg)
                 except:
                     loggings.error("JOPA")
                     keep_logging = True
@@ -107,11 +57,11 @@ def monitoring() :
             if (host.otval_date != "") :
                 try:
                     delta = str(datetime.datetime.now() - host.otval_date)
-                    msg = f"{host.name} was unavailable for " + delta.split(".")[0]
+                    msg = f"{hosts_list[0]}: '{host.name}' was unavailable for " + delta.split(".")[0]
                     loggings.info(msg)
                     for addresat in addr_list:
                         if host.notify and addresat.listen:
-                            globals.TELEBOT.send_message(addresat.chat_id, msg)
+                            globals.TELEBOT.send_message(addresat.id, msg)
                         keep_logging = True
                     host.otval_date = ""
                 except:
@@ -120,8 +70,10 @@ def monitoring() :
     prev_hosts_down = prev_hosts_down + 1 if cur_hosts_down > 0 else 0
     cur_hosts_down = 0
     
-get_receivers() 
-get_hosts()
+addr_list = get_receivers(globals.CONF_TG_CHATS) 
+ping_list = get_hosts(globals.CONF_PING, 'ping')
+curl_list = get_hosts(globals.CONF_CURL, 'curl')
+
 loggings.configure_logger()
 
 hello_msg = ''
@@ -135,12 +87,13 @@ _We send the file with the current configuration below:_
     
 for addresat in addr_list:
     if addresat.listen:
-        globals.TELEBOT.send_message(addresat.chat_id, f"Hi, *{addresat.name}*! Monitoring started! {hello_msg}", parse_mode="Markdown")
+        globals.TELEBOT.send_message(addresat.id, f"Hi, *{addresat.name}*! Monitoring started! {hello_msg}", parse_mode="Markdown")
         if globals.IS_NEWVERSION:
-            globals.TELEBOT.send_document(addresat.chat_id, open(globals.CONFIG_FILE,"rb"))
-loggings.info(f'Monitoring started for TG addresats {[(addresat.name, addresat.chat_id) for addresat in addr_list if addresat.listen]}')
+            globals.TELEBOT.send_document(addresat.id, open(globals.CONFIG_FILE,"rb"))
+loggings.info(f'Monitoring started for TG addresats {[(addresat.name, addresat.id) for addresat in addr_list if addresat.listen]}')
 
 while(True) :
-    monitoring()
+    monitoring(curl_list)
+    monitoring(ping_list)
     loggings.check_dates()
     sleep(globals.CONF_AWAIT_TIME)

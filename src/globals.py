@@ -5,9 +5,9 @@ import yaml
 import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.6'
+CONF_VERSION = '1.0.7'
 LAST_UPDATES = '''
-- Disable support for /help and /ping. 
+- Remake config
 '''
 
 DATA_DIRECTORY = os.getenv('DATA_DIRECTORY', 'data')
@@ -48,7 +48,8 @@ CONF_TOKEN = config['token']
 CONF_LOG_IMPORTANT = config['log_important']
 CONF_AWAIT_TIME = config['await_time'] 
 CONF_TG_CHATS = config['tg_chats']
-CONF_IPS = config['ips']
-CONF_DOMAINS = config['domains']
+CONF_PING = config['ping']
+CONF_CURL = config['curl']
+CONF_DELIMITER = config['delimiter']
 
 TELEBOT = telebot.TeleBot(CONF_TOKEN)
