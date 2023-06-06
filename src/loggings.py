@@ -1,4 +1,3 @@
-from os import path
 import os
 import logging
 import globals
@@ -11,7 +10,7 @@ def configure_logger() :
     '''
     Reconfiguration of the logger to make up-to-date parameters.
     '''
-    if not path.exists(globals.LOG_DIRECTORY):
+    if not os.path.exists(globals.LOG_DIRECTORY):
         os.makedirs(globals.LOG_DIRECTORY)  
     logging.basicConfig(
         filename=f'{globals.LOG_DIRECTORY}/monitoring-{CURRENT_DATA}.log', 

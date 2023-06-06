@@ -1,24 +1,24 @@
-##############################################################
-##   Specify the current telegram token of your bot.        ##
-##############################################################
+###############################################################
+##   Specify the current telegram token of your bot.         ##
+###############################################################
 token: 1234567890:YOUR-BOT-TOKEN-FROM-BOT-FATHER
-##############################################################
-##   Set whether extended logging is necessary.             ##
-##   Extended logging - logs each check.                    ##
-##                                                          ##
-##   Context:                                               ##
-##   > True   -- Skips duplicate logger messages            ##
-##   > False  -- Logs every action                          ##
-##############################################################
+###############################################################
+##   Set whether extended logging is necessary.              ##
+##   Extended logging - logs each check.                     ##
+##                                                           ##
+##   Context:                                                ##
+##   > True   -- Skips duplicate logger messages             ##
+##   > False  -- Logs every action                           ##
+###############################################################
 log_important: False
-##############################################################
-##   Waiting time between requests in seconds               ##
-##############################################################
+###############################################################
+##   Waiting time between requests in seconds                ##
+###############################################################
 await_time: 2
-##############################################################
-## Set the correct delimiter for the time. Possible options ##
-## in different systems: comma or dot                       ##
-##############################################################
+###############################################################
+## Set the correct delimiter for the time. Possible options  ##
+## in different systems: comma or dot                        ##
+###############################################################
 delimiter: ','
 ###############################################################
 ##   List of chats to which notifications will be sent       ##
@@ -29,11 +29,13 @@ delimiter: ','
 ##   > Listen mark:                                          ##
 ##      False -- the addressee will be ignored               ##
 ##      True  -- the addressee receives the letters          ##
+##   > Sending daily logs to Telegram (True/False)           ##
 ###############################################################
 tg_chats:
   - id: 123456789
     name: Ivan # not necessarily required
     listen: True
+    send_log_every_day: True
 ###############################################################
 ##   List of host addresses to check.                        ##
 ##   Observe the order!                                      ##

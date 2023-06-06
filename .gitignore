@@ -1,3 +1,4 @@
 config.yml
 logs/
 __pycache__
+version

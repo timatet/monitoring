@@ -1,5 +1,9 @@
-import os, subprocess, json, globals, time, loggings
-
+import os
+import subprocess
+import json
+import globals
+import time
+import loggings
 
 ADDRESATES = []
 PING_LIST = []
@@ -8,16 +12,18 @@ CURL_LIST = []
 UPDATED = ''
 
 class Addresat :
-    def __init__(self, id : str, name : str, listen : bool):
+    def __init__(self, id : str, name : str, listen : bool, send_log_every_day : bool):
         self.id = id
         self.name = name
         self.listen = listen
+        self.send_log_every_day = send_log_every_day
         
     def to_json(self) -> dict: 
         return {
             'id': self.id,
             'name': self.name,
-            'listen': self.listen
+            'listen': self.listen,
+            'send_log_every_day': self.send_log_every_day
         }
     
 class Host :   
@@ -71,7 +77,8 @@ def get_receivers(conf_addr_objs) -> list :
         addr_list.append(Addresat(
             id       = tg_chat['id'],
             name     = tg_chat['name'],
-            listen   = tg_chat['listen']
+            listen   = tg_chat['listen'],
+            send_log_every_day = tg_chat['send_log_every_day']
         ))  
     return addr_list
 

@@ -1,10 +1,11 @@
-import os
 from time import sleep
 import datetime
-import subprocess
+import threading
 import globals
 import loggings
 import configs
+import schedule
+import time
 
 ### Defining local variables
 loggings.info(f"A new session has been started. Service version: {globals.CONF_VERSION}")
@@ -84,6 +85,23 @@ for addresat in configs.ADDRESATES:
         if globals.IS_NEWVERSION:
             globals.TELEBOT.send_document(addresat.id, open(globals.CONFIG_FILE,"rb"))
 loggings.info(f'Monitoring started for TG addresats {[(addresat.name, addresat.id) for addresat in configs.ADDRESATES if addresat.listen]}')
+
+def send_log() :
+    loggings.info('Every day log sending begin...')
+    for addresat in configs.ADDRESATES:
+        if addresat.send_log_every_day:
+            globals.TELEBOT.send_document(addresat.id, open(f'{globals.LOG_DIRECTORY}/monitoring-{loggings.CURRENT_DATA}.log', 'rb'), caption = 'Sending logs for the past day')
+    loggings.info('Every day log sending ended.')
+
+schedule.every(1).day.at('23:59').do(send_log)
+    
+def pende_tasks() :
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
+
+sheduler_pending = threading.Thread(target=pende_tasks)
+sheduler_pending.start()
 
 while(True) :
     monitoring(configs.PING_LIST)

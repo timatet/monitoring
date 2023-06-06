@@ -1,13 +1,12 @@
 import os
-from os import path
 import shutil
 import yaml
 import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.7'
+CONF_VERSION = '1.0.8'
 LAST_UPDATES = '''
-- Remake config
+- Enable every day log sending. (it is possible to disable it in the configuration)
 '''
 
 DATA_DIRECTORY = os.getenv('DATA_DIRECTORY', 'data')
@@ -29,7 +28,7 @@ def read_config() :
     global config
     
     ### Reading the configuration file
-    if path.isfile(CONFIG_FILE_NAME) and not path.isfile(CONFIG_FILE):
+    if os.path.isfile(CONFIG_FILE_NAME) and not os.path.isfile(CONFIG_FILE):
         shutil.copyfile(CONFIG_FILE_NAME, CONFIG_FILE)
     try:
         f = open(CONFIG_FILE, 'r')
@@ -49,12 +48,10 @@ def read_config() :
         exit(0)
 
 read_config()
-
-
     
 ### Checking version
 IS_NEWVERSION = False
-if not path.isfile(FILE_VERSION):
+if not os.path.isfile(FILE_VERSION):
     vers_file = open(FILE_VERSION, 'x')
     vers_file.write(CONF_VERSION)
     IS_NEWVERSION = True
