@@ -4,9 +4,9 @@ import yaml
 import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.8'
+CONF_VERSION = '1.0.9'
 LAST_UPDATES = '''
-- Enable every day log sending. (it is possible to disable it in the configuration)
+- Enable handlers. Use /help for start
 '''
 
 DATA_DIRECTORY = os.getenv('DATA_DIRECTORY', 'data')

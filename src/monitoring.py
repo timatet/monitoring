@@ -6,6 +6,7 @@ import loggings
 import configs
 import schedule
 import time
+import handlers
 
 ### Defining local variables
 loggings.info(f"A new session has been started. Service version: {globals.CONF_VERSION}")
@@ -102,6 +103,9 @@ def pende_tasks() :
 
 sheduler_pending = threading.Thread(target=pende_tasks)
 sheduler_pending.start()
+
+tg_bot_polling = threading.Thread(target=handlers.poll_tg_bot)
+tg_bot_polling.start()
 
 while(True) :
     monitoring(configs.PING_LIST)

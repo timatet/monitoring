@@ -1,3 +1,5 @@
 pyTelegramBotAPI
 pyyaml
 schedule
+ruamel.yaml
+whois

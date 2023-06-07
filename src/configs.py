@@ -1,9 +1,12 @@
 import os
 import subprocess
+from subprocess import DEVNULL, STDOUT
 import json
 import globals
 import time
 import loggings
+import ruamel.yaml
+import whois
 
 ADDRESATES = []
 PING_LIST = []
@@ -43,7 +46,7 @@ class Host :
             received_http_code = subprocess.check_output(f"curl -skL -o /dev/null -w '%{self.http_normal_code}' -m 1 {self.host} || echo ''", shell=True).decode('UTF-8')
             return received_http_code == self.http_normal_code
         elif self.check_method == "ping" :
-            return os.system(f"ping -c 3 -W 0{globals.CONF_DELIMITER}1 -i 0{globals.CONF_DELIMITER}2 {self.host} >> /dev/null") == 0
+            return os.system(f"ping -c 3 -W 0{globals.CONF_DELIMITER}1 -i 0{globals.CONF_DELIMITER}2 {self.host} >> /dev/null 2>&1") == 0
         
     def to_json(self) -> dict: 
         return {
@@ -135,3 +138,147 @@ def check_config_update() :
         loggings.info('Config updated.')
         for addresat in ADDRESATES:
             globals.TELEBOT.send_document(addresat.id, open(globals.CONFIG_FILE,"rb"), caption = 'Config updated.')
+            
+def set_state(state, addresat, value):
+    yaml = ruamel.yaml.YAML()
+    with open(globals.CONFIG_FILE) as f:
+        config = yaml.load(f)
+        
+    if state == 'user.name':
+        for conf_elem in config['tg_chats']:
+            if conf_elem['id'] == addresat.id:
+                conf_elem['name'] = value
+                break
+    elif state == 'user.listen':
+        for conf_elem in config['tg_chats']:
+            if conf_elem['id'] == addresat.id:
+                _value = eval(value.lower().capitalize())
+                if _value == True or _value == False:
+                    conf_elem['listen'] = _value
+                else:
+                    raise Exception("Values for 'user.listen' must be true or false")
+                break
+    elif state == 'user.send_log':
+        for conf_elem in config['tg_chats']:
+            if conf_elem['id'] == addresat.id:
+                _value = eval(value.lower().capitalize())
+                if _value == True or _value == False:
+                    conf_elem['send_log_every_day'] = _value
+                else:
+                    raise Exception("Values for 'user.send_log' must be true or false")
+                break
+    elif state == 'await_time':
+        config['await_time'] = int(value)
+    else:
+        raise Exception("Bad command!")
+
+    with open(globals.CONFIG_FILE, 'w') as f:
+        yaml.dump(config, f)
+        
+def get_state(state, addresat):
+    yaml = ruamel.yaml.YAML()
+    with open(globals.CONFIG_FILE) as f:
+        config = yaml.load(f)
+        
+    if state == 'user.name':
+        for conf_elem in config['tg_chats']:
+            if conf_elem['id'] == addresat.id:
+                return conf_elem['name']
+    elif state == 'user.listen':
+        for conf_elem in config['tg_chats']:
+            if conf_elem['id'] == addresat.id:
+                return conf_elem['listen'] 
+    elif state == 'user.send_log':
+        for conf_elem in config['tg_chats']:
+            if conf_elem['id'] == addresat.id:
+                return conf_elem['send_log_every_day']
+    elif state == 'await_time':
+        return config['await_time']
+    else:
+        raise Exception("Bad command!")
+
+def is_ip(address):
+    return address.replace('.', '').isnumeric()
+
+def is_registered(domain_name):
+    return '.' in domain_name
+    
+def add_host(_host, _name, _stop_after, _notify, _priority, method):
+    yaml = ruamel.yaml.YAML()
+    with open(globals.CONFIG_FILE) as f:
+        config = yaml.load(f)
+        
+    exception_list = []
+    
+    if is_ip(_host) == False and is_registered(_host) == False:
+        exception_list.append(f"Value {_host} for 'host' must be ip or registered domain")
+    
+    _value = eval(_stop_after.lower().capitalize())
+    if _value != True and _value != False:
+        exception_list.append(f"Value {_stop_after} for 'stop_after' must be true or false")
+
+    _value = eval(_notify.lower().capitalize())
+    if _value != True and _value != False:
+        exception_list.append(f"Value {_notify} for 'notify' must be true or false")
+        
+    try:
+        int(_priority)
+    except:
+        exception_list.append(f"Value {_priority} for 'priority' must be integer")
+    
+    if len(exception_list) > 0:
+        raise Exception('\n'.join(exception_list))
+
+    _host = dict([('host', _host), ('name', _name), ('stop_after', eval(_stop_after.lower().capitalize())), ('notify', eval(_notify.lower().capitalize())), ('priority', int(_priority))])
+    if config[method] != None:
+        config[method].append(_host)
+    else:
+        config[method] = [_host]
+
+    with open(globals.CONFIG_FILE, 'w') as f:
+        yaml.dump(config, f)
+        
+def rm_host(host_name, method):
+    yaml = ruamel.yaml.YAML()
+    with open(globals.CONFIG_FILE) as f:
+        config = yaml.load(f)
+    
+    removed = False
+    if config[method] != None:
+        for idx, conf_elem in enumerate(config[method]):
+            if conf_elem['host'] == host_name:
+                del config[method][idx]
+                removed = True
+                break
+    
+    if removed == False:
+        raise Exception('Host name not found in config')
+    
+    with open(globals.CONFIG_FILE, 'w') as f:
+        yaml.dump(config, f)
+
+def host_list(method):   
+    response = []
+    
+    if method == 'ping':
+        hosts = PING_LIST[1:]
+    else:
+        hosts = CURL_LIST[1:]
+        
+    for host in hosts:
+        response.append(f"{host.host}:\n\t\tName: {host.name}\n\t\tStop after: {host.stop_after}\n\t\tNotify: {host.notify}\n\t\tPriority: {host.priority}")
+
+    _response = '\n'.join(response)
+    if _response == '':
+        _response = 'The host list is empty!'
+    return _response
+    
+def validate_user(addresat):
+    yaml = ruamel.yaml.YAML()
+    with open(globals.CONFIG_FILE) as f:
+        config = yaml.load(f)
+        
+    for conf_elem in config['tg_chats']:
+        if conf_elem['id'] == addresat.id:
+            return True
+    return False
