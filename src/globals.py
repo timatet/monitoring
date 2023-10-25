@@ -4,9 +4,9 @@ import yaml
 import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.11'
+CONF_VERSION = '1.0.11 [fix]'
 LAST_UPDATES = '''
-- Исправлена ошибка в работе параметра stop_after
+- Исправлена ошибка в работе параметра stop\_after
 - Version handler
 '''
 
