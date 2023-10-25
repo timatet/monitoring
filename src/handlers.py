@@ -20,6 +20,8 @@ Use the following commands to view the set values:
 /rm [ping/curl] [host]
 
 /list [ping/curl] - return list of hosts
+
+/version - return current version
 '''
 
 @globals.TELEBOT.message_handler(commands=['help'])
@@ -135,6 +137,20 @@ def list(message):
         
         host_list = configs.host_list(method)
         globals.TELEBOT.reply_to(message, host_list)
+    except IndexError as e:
+        globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
+    except Exception as e:
+        globals.TELEBOT.reply_to(message, e)
+        
+@globals.TELEBOT.message_handler(commands=['version'])
+def list(message):
+    
+    if configs.validate_user(message.from_user) == False:
+        globals.TELEBOT.reply_to(message, 'User is not authorized in config')
+        return
+
+    try:
+        globals.TELEBOT.reply_to(message, f"{globals.CONF_VERSION} : {globals.LAST_UPDATES}")
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
     except Exception as e:

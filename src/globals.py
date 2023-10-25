@@ -4,9 +4,10 @@ import yaml
 import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.10'
+CONF_VERSION = '1.0.11'
 LAST_UPDATES = '''
 - Исправлена ошибка в работе параметра stop_after
+- Version handler
 '''
 
 DATA_DIRECTORY = os.getenv('DATA_DIRECTORY', 'data')
