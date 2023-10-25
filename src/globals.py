@@ -4,9 +4,9 @@ import yaml
 import telebot
 
 ### Edited before the deployment
-CONF_VERSION = '1.0.9'
+CONF_VERSION = '1.0.10'
 LAST_UPDATES = '''
-- Enable handlers. Use /help for start
+- Исправлена ошибка в работе параметра stop_after
 '''
 
 DATA_DIRECTORY = os.getenv('DATA_DIRECTORY', 'data')

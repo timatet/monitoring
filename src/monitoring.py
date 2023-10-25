@@ -22,49 +22,52 @@ def monitoring(hosts_list) :
     
     if keep_logging:
         loggings.info(f"{hosts_list[0]}: Checking...")
-    for host in hosts_list[1:] :
-        if (not host.check()) :
+        
+    host_idx = 0
+    while host_idx in range(len(hosts_list[1:])) :
+        if (not hosts_list[host_idx + 1].check()) :
             cur_hosts_down += 1
             if keep_logging:
-                loggings.info(f"host.name : {host.name}, host.otval_cnt : {host.otval_cnt}, prev_hosts_down : {prev_hosts_down}, cur_hosts_down : {cur_hosts_down}")
+                loggings.info(f"host.name : {hosts_list[host_idx + 1].name}, host.otval_cnt : {hosts_list[host_idx + 1].otval_cnt}, prev_hosts_down : {prev_hosts_down}, cur_hosts_down : {cur_hosts_down}")
                 if globals.CONF_LOG_IMPORTANT:
                     keep_logging = False
-            if (host.otval_cnt < 3 - (1 if (prev_hosts_down > host.otval_cnt) else 0)) : #если отвалился шлюз ближе, чем тот, который был раньше замечен
-                host.otval_cnt += 1
+            if (hosts_list[host_idx + 1].otval_cnt < 3 - (1 if (prev_hosts_down > hosts_list[host_idx + 1].otval_cnt) else 0)) : #если отвалился шлюз ближе, чем тот, который был раньше замечен
+                hosts_list[host_idx + 1].otval_cnt += 1
                 continue
             
-            if (host.otval_date == "") :
-                host.otval_date = datetime.datetime.now()
+            if (hosts_list[host_idx + 1].otval_date == "") :
+                hosts_list[host_idx + 1].otval_date = datetime.datetime.now()
                 try:
-                    msg = f"{hosts_list[0]}: '{host.name}' is unavailable"
+                    msg = f"{hosts_list[0]}: '{hosts_list[host_idx + 1].name}' is unavailable"
                     loggings.info(msg)
                     keep_logging = True
                     for addresat in configs.ADDRESATES:
-                        if host.notify and addresat.listen:
+                        if hosts_list[host_idx + 1].notify and addresat.listen:
                             globals.TELEBOT.send_message(addresat.id, msg)
                 except:
                     loggings.error("JOPA")
                     keep_logging = True
              
-            if host.stop_after :
+            if hosts_list[host_idx + 1].stop_after :
                 loggings.warning("BREAK")
                 keep_logging = True
                 break
         else :
-            host.otval_cnt = 0
-            if (host.otval_date != "") :
+            hosts_list[host_idx + 1].otval_cnt = 0
+            if (hosts_list[host_idx + 1].otval_date != "") :
                 try:
-                    delta = str(datetime.datetime.now() - host.otval_date)
-                    msg = f"{hosts_list[0]}: '{host.name}' was unavailable for " + delta.split(".")[0]
+                    delta = str(datetime.datetime.now() - hosts_list[host_idx + 1].otval_date)
+                    msg = f"{hosts_list[0]}: '{hosts_list[host_idx + 1].name}' was unavailable for " + delta.split(".")[0]
                     loggings.info(msg)
                     for addresat in configs.ADDRESATES:
-                        if host.notify and addresat.listen:
+                        if hosts_list[host_idx + 1].notify and addresat.listen:
                             globals.TELEBOT.send_message(addresat.id, msg)
                         keep_logging = True
-                    host.otval_date = ""
+                    hosts_list[host_idx + 1].otval_date = ""
                 except:
                     loggings.error("JOPA")
                     keep_logging = True
+        host_idx += 1
     prev_hosts_down = prev_hosts_down + 1 if cur_hosts_down > 0 else 0
     cur_hosts_down = 0
 
