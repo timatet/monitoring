@@ -12,17 +12,17 @@ import handlers
 loggings.info(f"A new session has been started. Service version: {globals.CONF_VERSION}")
 
 prev_hosts_down = 0
-cur_hosts_down  = 0     
+cur_hosts_down  = 0
 keep_logging = True
 
 def monitoring(hosts_list) :
     global prev_hosts_down
     global cur_hosts_down
     global keep_logging
-    
+
     if keep_logging:
         loggings.info(f"{hosts_list[0]}: Checking...")
-        
+
     host_idx = 0
     while host_idx in range(len(hosts_list[1:])) :
         if (not hosts_list[host_idx + 1].check()) :
@@ -34,7 +34,7 @@ def monitoring(hosts_list) :
             if (hosts_list[host_idx + 1].otval_cnt < 3 - (1 if (prev_hosts_down > hosts_list[host_idx + 1].otval_cnt) else 0)) : #если отвалился шлюз ближе, чем тот, который был раньше замечен
                 hosts_list[host_idx + 1].otval_cnt += 1
                 continue
-            
+
             if (hosts_list[host_idx + 1].otval_date == "") :
                 hosts_list[host_idx + 1].otval_date = datetime.datetime.now()
                 try:
@@ -47,7 +47,7 @@ def monitoring(hosts_list) :
                 except:
                     loggings.error("JOPA")
                     keep_logging = True
-             
+
             if hosts_list[host_idx + 1].stop_after :
                 loggings.warning("BREAK")
                 keep_logging = True
@@ -77,12 +77,12 @@ loggings.configure_logger()
 hello_msg = ''
 if globals.IS_NEWVERSION:
     hello_msg = f'''
-    
+
 Service update! New version is *v{globals.CONF_VERSION}*.
 {globals.LAST_UPDATES}
 _We send the file with the current configuration below:_
 '''
-    
+
 for addresat in configs.ADDRESATES:
     if addresat.listen:
         globals.TELEBOT.send_message(addresat.id, f"Hi, *{addresat.name}*! Monitoring started! {hello_msg}", parse_mode="Markdown")
@@ -98,7 +98,7 @@ def send_log() :
     loggings.info('Every day log sending ended.')
 
 schedule.every(1).day.at('23:59').do(send_log)
-    
+
 def pende_tasks() :
     while 1:
         schedule.run_pending()

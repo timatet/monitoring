@@ -27,7 +27,7 @@ CONF_DELIMITER = None
 config = ''
 def read_config() :
     global config
-    
+
     ### Reading the configuration file
     if os.path.isfile(CONFIG_FILE_NAME) and not os.path.isfile(CONFIG_FILE):
         shutil.copyfile(CONFIG_FILE_NAME, CONFIG_FILE)
@@ -35,11 +35,11 @@ def read_config() :
         f = open(CONFIG_FILE, 'r')
         config = yaml.load(f.read().replace('\t', '  '), Loader=yaml.FullLoader)
         f.close()
-        
+
         global CONF_TOKEN, CONF_LOG_IMPORTANT, CONF_AWAIT_TIME, CONF_TG_CHATS, CONF_PING, CONF_CURL, CONF_DELIMITER
         CONF_TOKEN = config['token']
         CONF_LOG_IMPORTANT = config['log_important']
-        CONF_AWAIT_TIME = config['await_time'] 
+        CONF_AWAIT_TIME = config['await_time']
         CONF_TG_CHATS = config['tg_chats']
         CONF_PING = config['ping']
         CONF_CURL = config['curl']
@@ -49,7 +49,7 @@ def read_config() :
         exit(0)
 
 read_config()
-    
+
 ### Checking version
 IS_NEWVERSION = False
 if not os.path.isfile(FILE_VERSION):
@@ -59,7 +59,7 @@ if not os.path.isfile(FILE_VERSION):
 else:
     vers_file = open(FILE_VERSION, 'r+')
     last_v = vers_file.readline()
-    
+
     if last_v != CONF_VERSION:
         vers_file.seek(0)
         vers_file.write(CONF_VERSION)
