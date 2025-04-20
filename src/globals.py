@@ -16,7 +16,12 @@ CONFIG_FILE = f'{DATA_DIRECTORY}/{CONFIG_FILE_NAME}'
 FILE_VERSION = f'{DATA_DIRECTORY}/version'
 LOG_DIRECTORY = f'{DATA_DIRECTORY}/logs'
 
-CONF_TOKEN = None
+if 'TG_BOT_TOKEN' in os.environ:
+    TG_BOT_TOKEN = os.getenv('TG_BOT_TOKEN')
+else:
+    print("Telegram bot token not specified")
+    exit(0)
+
 CONF_LOG_IMPORTANT = None
 CONF_AWAIT_TIME = None
 CONF_TG_CHATS = None
@@ -36,8 +41,7 @@ def read_config() :
         config = yaml.load(f.read().replace('\t', '  '), Loader=yaml.FullLoader)
         f.close()
 
-        global CONF_TOKEN, CONF_LOG_IMPORTANT, CONF_AWAIT_TIME, CONF_TG_CHATS, CONF_PING, CONF_CURL, CONF_DELIMITER
-        CONF_TOKEN = config['token']
+        global CONF_LOG_IMPORTANT, CONF_AWAIT_TIME, CONF_TG_CHATS, CONF_PING, CONF_CURL, CONF_DELIMITER
         CONF_LOG_IMPORTANT = config['log_important']
         CONF_AWAIT_TIME = config['await_time']
         CONF_TG_CHATS = config['tg_chats']
@@ -67,4 +71,4 @@ else:
         IS_NEWVERSION = True
 vers_file.close()
 
-TELEBOT = telebot.TeleBot(CONF_TOKEN)
+TELEBOT = telebot.TeleBot(TG_BOT_TOKEN)

@@ -1,8 +1,4 @@
 ###############################################################
-##   Specify the current telegram token of your bot.         ##
-###############################################################
-token: 1234567890:YOUR-BOT-TOKEN-FROM-BOT-FATHER
-###############################################################
 ##   Set whether extended logging is necessary.              ##
 ##   Extended logging - logs each check.                     ##
 ##                                                           ##
