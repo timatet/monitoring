@@ -1,6 +1,7 @@
 import globals
 import loggings
 import time
+import re
 import configs
 
 help_message = '''
@@ -19,7 +20,7 @@ Use the following commands to view the set values:
 /add [ping/curl] [host] [name] [stop_after: true/false] [notify: true/false] [priority: integer]
 /rm [ping/curl] [host]
 
-/list [ping/curl] - return list of hosts
+/list [ping/curl] [ |W|E] - return list of hosts. W - falls count gt 1. E - falls count gt 3.
 
 /version - return current version
 '''
@@ -43,7 +44,7 @@ def set(message):
         globals.TELEBOT.reply_to(message, 'User is not authorized')
         return
 
-    message_text = message.text.split(' ')
+    message_text = re.sub(' +', ' ', message.text).strip().split(' ')
     try:
         commandlet = message_text[1]
         argument = message_text[2]
@@ -60,7 +61,7 @@ def get(message):
         globals.TELEBOT.reply_to(message, 'User is not authorized')
         return
 
-    message_text = message.text.split(' ')
+    message_text = re.sub(' +', ' ', message.text).strip().split(' ')
     try:
         commandlet = message_text[1]
         response = configs.get_state(commandlet, message.from_user)
@@ -77,7 +78,7 @@ def add(message):
         globals.TELEBOT.reply_to(message, 'User is not authorized in config')
         return
 
-    message_text = message.text.split(' ')
+    message_text = re.sub(' +', ' ', message.text).strip().split(' ')
     try:
         method = message_text[1]
 
@@ -104,7 +105,7 @@ def rm(message):
         globals.TELEBOT.reply_to(message, 'User is not authorized in config')
         return
 
-    message_text = message.text.split(' ')
+    message_text = re.sub(' +', ' ', message.text).strip().split(' ')
     try:
         method = message_text[1]
 
@@ -127,7 +128,7 @@ def list(message):
         globals.TELEBOT.reply_to(message, 'User is not authorized in config')
         return
 
-    message_text = message.text.split(' ')
+    message_text = re.sub(' +', ' ', message.text).strip().split(' ')
     try:
         method = message_text[1]
 
@@ -135,7 +136,18 @@ def list(message):
             globals.TELEBOT.reply_to(message, 'Validate methods: ping or curl')
             return
 
-        host_list = configs.host_list(method)
+        otval_cnt_filter = 0
+        if len(message_text) == 3:
+            log_state = message_text[2]
+            if log_state != 'W' and log_state != 'E':
+                globals.TELEBOT.reply_to(message, 'Validate states: W or E')
+                return
+            if log_state == 'W':
+                otval_cnt_filter = 1
+            elif log_state == 'E':
+                otval_cnt_filter = 3
+
+        host_list = configs.host_list(method, otval_cnt_filter)
         globals.TELEBOT.reply_to(message, host_list)
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')

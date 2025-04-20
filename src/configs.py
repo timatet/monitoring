@@ -257,7 +257,7 @@ def rm_host(host_name, method):
     with open(globals.CONFIG_FILE, 'w') as f:
         yaml.dump(config, f)
 
-def host_list(method):
+def host_list(method, otval_cnt_filter = 0):
     response = []
 
     if method == 'ping':
@@ -265,8 +265,17 @@ def host_list(method):
     else:
         hosts = CURL_LIST[1:]
 
+    hosts = filter(lambda host: host.otval_cnt > otval_cnt_filter, hosts)
+
     for host in hosts:
-        response.append(f"{host.host}:\n\t\tName: {host.name}\n\t\tStop after: {host.stop_after}\n\t\tNotify: {host.notify}\n\t\tPriority: {host.priority}")
+        response.append(
+            f"{host.host}:\n\t\tName: {host.name}" +
+            "\n\t\tStop after: {host.stop_after}" +
+            "\n\t\tNotify: {host.notify}" +
+            "\n\t\tPriority: {host.priority}" +
+            "\n\t\tFalls: {host.otval_cnt}" if otval_cnt_filter > 0 else "" +
+            "\n\t\tLast fall date: {host.otval_date}" if otval_cnt_filter > 0 else ""
+        )
 
     _response = '\n'.join(response)
     if _response == '':
