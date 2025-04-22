@@ -273,8 +273,8 @@ def host_list(method, otval_cnt_filter = 0):
             f"\n\t\tStop after: {host.stop_after}" +
             f"\n\t\tNotify: {host.notify}" +
             f"\n\t\tPriority: {host.priority}" +
-            f"\n\t\tFalls: {host.otval_cnt}" if otval_cnt_filter > 0 else "" +
-            f"\n\t\tLast fall date: {host.otval_date}" if otval_cnt_filter > 0 else ""
+            (f"\n\t\tFalls: {host.otval_cnt}" if otval_cnt_filter > 0 else "") +
+            (f"\n\t\tLast fall date: {host.otval_date}" if otval_cnt_filter > 0 else "")
         )
 
     _response = '\n'.join(response)
