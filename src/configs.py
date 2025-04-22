@@ -265,7 +265,7 @@ def host_list(method, otval_cnt_filter = 0):
     else:
         hosts = CURL_LIST[1:]
 
-    hosts = filter(lambda host: host.otval_cnt > otval_cnt_filter, hosts)
+    hosts = filter(lambda host: host.otval_cnt >= otval_cnt_filter, hosts)
 
     for host in hosts:
         response.append(
