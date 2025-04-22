@@ -37,8 +37,8 @@ class Host :
         self.http_normal_code = http_normal_code
         self.stop_after = stop_after
         self.notify = notify
-        self.otval_cnt = 0
-        self.otval_date = ''
+        self.falls_cnt = 0
+        self.fall_date = ''
         self.priority = priority
 
     def check(self) -> bool :
@@ -257,7 +257,7 @@ def rm_host(host_name, method):
     with open(globals.CONFIG_FILE, 'w') as f:
         yaml.dump(config, f)
 
-def host_list(method, otval_cnt_filter = 0):
+def host_list(method, falls_cnt_filter = 0):
     response = []
 
     if method == 'ping':
@@ -265,7 +265,7 @@ def host_list(method, otval_cnt_filter = 0):
     else:
         hosts = CURL_LIST[1:]
 
-    hosts = filter(lambda host: host.otval_cnt >= otval_cnt_filter, hosts)
+    hosts = filter(lambda host: host.falls_cnt >= falls_cnt_filter, hosts)
 
     for host in hosts:
         response.append(
@@ -273,8 +273,8 @@ def host_list(method, otval_cnt_filter = 0):
             f"\n\t\tStop after: {host.stop_after}" +
             f"\n\t\tNotify: {host.notify}" +
             f"\n\t\tPriority: {host.priority}" +
-            (f"\n\t\tFalls: {host.otval_cnt}" if otval_cnt_filter > 0 else "") +
-            (f"\n\t\tLast fall date: {host.otval_date}" if otval_cnt_filter > 0 else "")
+            (f"\n\t\tFalls: {host.falls_cnt}" if falls_cnt_filter > 0 else "") +
+            (f"\n\t\tLast fall date: {host.fall_date}" if falls_cnt_filter > 0 else "")
         )
 
     _response = '\n'.join(response)

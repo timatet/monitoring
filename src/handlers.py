@@ -140,18 +140,18 @@ def list(message):
             globals.TELEBOT.reply_to(message, 'Validate methods: ping or curl')
             return
 
-        otval_cnt_filter = 0
+        falls_cnt_filter = 0
         if len(message_text) == 3:
             log_state = message_text[2]
             if log_state != 'W' and log_state != 'E':
                 globals.TELEBOT.reply_to(message, 'Validate states: W or E')
                 return
             if log_state == 'W':
-                otval_cnt_filter = 1
+                falls_cnt_filter = 1
             elif log_state == 'E':
-                otval_cnt_filter = 3
+                falls_cnt_filter = 3
 
-        host_list = configs.host_list(method, otval_cnt_filter)
+        host_list = configs.host_list(method, falls_cnt_filter)
         globals.TELEBOT.reply_to(message, host_list)
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')

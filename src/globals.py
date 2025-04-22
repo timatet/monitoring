@@ -48,7 +48,8 @@ def read_config() :
         CONF_PING = config['ping']
         CONF_CURL = config['curl']
         CONF_DELIMITER = config['delimiter']
-    except:
+    except Exception as e:
+        print(e)
         print(f"Configuration file error: {CONFIG_FILE}")
         exit(0)
 
