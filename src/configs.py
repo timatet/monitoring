@@ -43,7 +43,7 @@ class Host :
 
     def check(self) -> bool :
         if self.check_method == "curl" :
-            received_http_code = subprocess.check_output(f"curl -skL -o /dev/null -w '%{self.http_normal_code}' -m 1 {self.host} || echo ''", shell=True).decode('UTF-8')
+            received_http_code = subprocess.check_output(f"curl -skL -o /dev/null -w '%{{http_code}}' -m 1 {self.host} || echo ''", shell=True).decode('UTF-8')
             return received_http_code == self.http_normal_code
         elif self.check_method == "ping" :
             return os.system(f"ping -c 3 -W 0{globals.CONF_DELIMITER}1 -i 0{globals.CONF_DELIMITER}2 {self.host} >> /dev/null 2>&1") == 0
@@ -66,7 +66,7 @@ def get_hosts(conf_host_objs, check_method) -> list :
                 name         = host['name'],
                 host         = host['host'],
                 check_method = check_method,
-                http_normal_code = host['http_normal_code'] if 'http_normal_code' in host else '',
+                http_normal_code = host['http_normal_code'] if 'http_normal_code' in host else '200',
                 stop_after   = host['stop_after'] == 1,
                 notify       = host['notify'],
                 priority     = host['priority']
