@@ -270,11 +270,11 @@ def host_list(method, otval_cnt_filter = 0):
     for host in hosts:
         response.append(
             f"{host.host}:\n\t\tName: {host.name}" +
-            "\n\t\tStop after: {host.stop_after}" +
-            "\n\t\tNotify: {host.notify}" +
-            "\n\t\tPriority: {host.priority}" +
-            "\n\t\tFalls: {host.otval_cnt}" if otval_cnt_filter > 0 else "" +
-            "\n\t\tLast fall date: {host.otval_date}" if otval_cnt_filter > 0 else ""
+            f"\n\t\tStop after: {host.stop_after}" +
+            f"\n\t\tNotify: {host.notify}" +
+            f"\n\t\tPriority: {host.priority}" +
+            f"\n\t\tFalls: {host.otval_cnt}" if otval_cnt_filter > 0 else "" +
+            f"\n\t\tLast fall date: {host.otval_date}" if otval_cnt_filter > 0 else ""
         )
 
     _response = '\n'.join(response)

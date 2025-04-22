@@ -52,6 +52,7 @@ def set(message):
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
     except Exception as e:
+        loggings.error(f'{message}: {e}')
         globals.TELEBOT.reply_to(message, e)
 
 @globals.TELEBOT.message_handler(commands=['get'])
@@ -69,6 +70,7 @@ def get(message):
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
     except Exception as e:
+        loggings.error(f'{message}: {e}')
         globals.TELEBOT.reply_to(message, e)
 
 @globals.TELEBOT.message_handler(commands=['add'])
@@ -96,6 +98,7 @@ def add(message):
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
     except Exception as e:
+        loggings.error(f'{message}: {e}')
         globals.TELEBOT.reply_to(message, e)
 
 @globals.TELEBOT.message_handler(commands=['rm'])
@@ -119,6 +122,7 @@ def rm(message):
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
     except Exception as e:
+        loggings.error(f'{message}: {e}')
         globals.TELEBOT.reply_to(message, e)
 
 @globals.TELEBOT.message_handler(commands=['list'])
@@ -152,6 +156,7 @@ def list(message):
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
     except Exception as e:
+        loggings.error(f'{message}: {e}')
         globals.TELEBOT.reply_to(message, e)
 
 @globals.TELEBOT.message_handler(commands=['version'])
@@ -166,6 +171,7 @@ def list(message):
     except IndexError as e:
         globals.TELEBOT.reply_to(message, 'Недостаточно аргументов!')
     except Exception as e:
+        loggings.error(f'{message}: {e}')
         globals.TELEBOT.reply_to(message, e)
 
 def poll_tg_bot():
