@@ -7,9 +7,9 @@ TIME_STYLE = "%Y-%m-%d"
 CURRENT_DATA = time.strftime(TIME_STYLE)
 
 def configure_logger() :
-    '''
-    Reconfiguration of the logger to make up-to-date parameters.
-    '''
+    """
+    Создает файл журнала, если он не существует.
+    """
     if not os.path.exists(globals.LOG_DIRECTORY):
         os.makedirs(globals.LOG_DIRECTORY)
     logging.basicConfig(
@@ -22,6 +22,9 @@ def configure_logger() :
     )
 
 def check_dates() :
+    """
+    Проверяет текущую дату и обновляет логгер, если дата изменилась.
+    """
     global CURRENT_DATA
     last_data = time.strftime(TIME_STYLE)
     if CURRENT_DATA != last_data:
@@ -29,10 +32,19 @@ def check_dates() :
         configure_logger()
 
 def error(log_msg):
+    """
+    Записывает сообщение об ошибке в лог.
+    """
     logging.error(log_msg)
 
 def info(log_msg):
+    """
+    Записывает информационное сообщение в лог.
+    """
     logging.info(log_msg)
 
 def warning(log_msg):
+    """
+    Записывает предупреждающее сообщение в лог.
+    """
     logging.warning(log_msg)

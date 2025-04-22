@@ -30,7 +30,13 @@ CONF_CURL = None
 CONF_DELIMITER = None
 
 config = ''
-def read_config() :
+def read_config():
+    """
+    Загружает конфигурацию из файла и инициализирует глобальные переменные.
+
+    Исключения:
+        Exception: Если файл конфигурации не найден или имеет некорректный формат.
+    """
     global config
 
     ### Reading the configuration file

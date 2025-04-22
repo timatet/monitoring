@@ -15,7 +15,22 @@ prev_hosts_down = 0
 cur_hosts_down  = 0
 keep_logging = True
 
-def monitoring(hosts_list) :
+def monitoring(hosts_list):
+    """
+    Функция для мониторинга списка хостов.
+
+    - Если флаг `keep_logging` установлен в `True`, то записывается информация о начале проверки хостов.
+    - Затем начинается цикл, который проходит по всем хостам в списке, начиная со второго элемента (индекс 1).
+    - Для каждого хоста проверяется его доступность с помощью метода `check()`. Если хост недоступен, то увеличивается счетчик `cur_hosts_down` и записывается информация о хосте, его количестве падений и текущем состоянии.
+    - Если количество падений хоста меньше определенного значения, то счетчик падений увеличивается и цикл продолжается.
+    - Если дата падения хоста не установлена, то устанавливается текущая дата и отправляется сообщение о недоступности хоста всем адресатам, которые подписаны на уведомления.
+    - Если установлен флаг `stop_after` для хоста, то цикл прерывается.
+    - Если хост доступен, то счетчик падений сбрасывается и, если дата падения была установлена, то записывается информация о времени недоступности хоста и отправляется сообщение о восстановлении доступности хоста всем адресатам, которые подписаны на уведомления.
+    - После завершения цикла обновляется значение `prev_hosts_down` и сбрасывается значение `cur_hosts_down`.
+
+    Параметры:
+        hosts_list (list): Список хостов для мониторинга.
+    """
     global prev_hosts_down
     global cur_hosts_down
     global keep_logging
@@ -90,7 +105,10 @@ for addresat in configs.ADDRESATES:
             globals.TELEBOT.send_document(addresat.id, open(globals.CONFIG_FILE,"rb"))
 loggings.info(f'Monitoring started for TG addresats {[(addresat.name, addresat.id) for addresat in configs.ADDRESATES if addresat.listen]}')
 
-def send_log() :
+def send_log():
+    """
+    Функция для отправки логов каждому адресату.
+    """
     loggings.info('Every day log sending begin...')
     for addresat in configs.ADDRESATES:
         if addresat.send_log_every_day:
@@ -99,7 +117,7 @@ def send_log() :
 
 schedule.every(1).day.at('23:59').do(send_log)
 
-def pende_tasks() :
+def pende_tasks():
     while 1:
         schedule.run_pending()
         time.sleep(1)
@@ -110,7 +128,7 @@ sheduler_pending.start()
 tg_bot_polling = threading.Thread(target=handlers.poll_tg_bot)
 tg_bot_polling.start()
 
-while(True) :
+while(True):
     monitoring(configs.PING_LIST)
     monitoring(configs.CURL_LIST)
     loggings.check_dates()

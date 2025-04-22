@@ -6,7 +6,7 @@ import globals
 import time
 import loggings
 import ruamel.yaml
-import whois
+import warnings
 
 ADDRESATES = []
 PING_LIST = []
@@ -15,6 +15,15 @@ CURL_LIST = []
 UPDATED = ''
 
 class Addresat :
+    """
+    Представляет получателя уведомлений.
+
+    Атрибуты:
+        id (str): Уникальный идентификатор чата.
+        name (str): Имя пользователя.
+        listen (bool): Флаг прослушивания уведомлений.
+        send_log_every_day (bool): Флаг ежедневной отправки логов.
+    """
     def __init__(self, id : str, name : str, listen : bool, send_log_every_day : bool):
         self.id = id
         self.name = name
@@ -22,6 +31,9 @@ class Addresat :
         self.send_log_every_day = send_log_every_day
 
     def to_json(self) -> dict:
+        """
+        Возвращает представление объекта Addresat в формате JSON-совместимого словаря.
+        """
         return {
             'id': self.id,
             'name': self.name,
@@ -30,6 +42,18 @@ class Addresat :
         }
 
 class Host :
+    """
+    Представляет хост, за которым необходимо следить.
+
+    Атрибуты:
+        name (str): Название хоста.
+        host (str): Адрес хоста.
+        check_method (str): Метод проверки (ping или curl).
+        http_normal_code (str): Ожидаемый HTTP-код ответа.
+        stop_after (bool): Останавливать проверку после падения.
+        notify (bool): Отправлять уведомление.
+        priority (int): Приоритет хоста.
+    """
     def __init__(self, name : str, host : str, check_method : str, http_normal_code : str, stop_after : bool, notify : bool, priority : int):
         self.name = name
         self.host = host
@@ -42,6 +66,10 @@ class Host :
         self.priority = priority
 
     def check(self) -> bool :
+        """
+        Выполняет проверку доступности хоста в зависимости от метода.
+        Возвращает True, если хост доступен.
+        """
         if self.check_method == "curl" :
             received_http_code = subprocess.check_output(f"curl -skL -o /dev/null -w '%{{http_code}}' -m 1 {self.host} || echo ''", shell=True).decode('UTF-8')
             return received_http_code == self.http_normal_code
@@ -49,6 +77,9 @@ class Host :
             return os.system(f"ping -c 3 -W 0{globals.CONF_DELIMITER}1 -i 0{globals.CONF_DELIMITER}2 {self.host} >> /dev/null 2>&1") == 0
 
     def to_json(self) -> dict:
+        """
+        Возвращает представление объекта Host в формате JSON-совместимого словаря.
+        """
         return {
             'host': self.host,
             'name': self.name,
@@ -59,6 +90,16 @@ class Host :
         }
 
 def get_hosts(conf_host_objs, check_method) -> list :
+    """
+    Создает список объектов Host из словаря конфигурации.
+
+    Аргументы:
+        conf_host_objs (list): Список словарей с данными хостов.
+        check_method (str): Метод проверки (ping или curl).
+
+    Возвращает:
+        list: Список Host-объектов, отсортированных по приоритету.
+    """
     hosts_list = []
     if conf_host_objs != None and len(conf_host_objs) > 0:
         for host in conf_host_objs:
@@ -75,6 +116,15 @@ def get_hosts(conf_host_objs, check_method) -> list :
     return sorted_by_priority
 
 def get_receivers(conf_addr_objs) -> list :
+    """
+    Создает список объектов Addresat из конфигурации.
+
+    Аргументы:
+        conf_addr_objs (list): Список словарей с данными адресатов.
+
+    Возвращает:
+        list: Список Addresat-объектов.
+    """
     addr_list = []
     for tg_chat in conf_addr_objs:
         addr_list.append(Addresat(
@@ -85,7 +135,17 @@ def get_receivers(conf_addr_objs) -> list :
         ))
     return addr_list
 
+@warnings.deprecated()
 def strip_python_tags(s : str):
+    """
+    Удаляет теги YAML, начинающиеся на '!!python/'.
+
+    Аргументы:
+        s (str): YAML-строка.
+
+    Возвращает:
+        str: Очищенная строка YAML.
+    """
     result = []
     for line in s.splitlines():
         idx = line.find("!!python/")
@@ -95,6 +155,17 @@ def strip_python_tags(s : str):
     return '\n'.join(result)
 
 class AppConfig :
+    """
+    Представляет основную конфигурацию приложения.
+
+    Атрибуты:
+        token (str): Токен телеграм-бота.
+        log_important (bool): Важные логи.
+        await_time (int): Время ожидания.
+        tg_chats (list): Список адресатов.
+        ping (list): Список хостов с методом ping.
+        domains (list): Список хостов с методом curl.
+    """
     def __init__(self, config_json : any):
         self.token = config_json['token']
         self.log_important = config_json['log_important']
@@ -104,6 +175,9 @@ class AppConfig :
         self.domains = get_hosts(config_json['domains'], 'curl')
 
     def to_json(self) -> dict:
+        """
+        Возвращает представление объекта AppConfig в формате JSON-совместимого словаря.
+        """
         return {
             'token': self.token,
             'log_important': self.log_important,
@@ -114,9 +188,18 @@ class AppConfig :
         }
 
 def update_date():
+    """
+    Получает дату последнего изменения конфигурационного файла.
+
+    Возвращает:
+        str: Дата последнего изменения.
+    """
     return time.ctime(os.path.getmtime(globals.CONFIG_FILE))
 
-def configure_config() :
+def configure_config():
+    """
+    Загружает и инициализирует глобальные переменные из конфигурационного файла.
+    """
     global UPDATED
     if UPDATED != '':
         globals.read_config()
@@ -132,14 +215,26 @@ def configure_config() :
 
     UPDATED = update_date()
 
-def check_config_update() :
-    if UPDATED != update_date() :
+def check_config_update():
+    """
+    Проверяет, обновлялся ли конфигурационный файл.<br>
+    При обновлении повторно загружает конфигурацию и уведомляет получателей.
+    """
+    if UPDATED != update_date():
         configure_config()
         loggings.info('Config updated.')
         for addresat in ADDRESATES:
             globals.TELEBOT.send_document(addresat.id, open(globals.CONFIG_FILE,"rb"), caption = 'Config updated.')
 
 def set_state(state, addresat, value):
+    """
+    Обновляет значение параметра в конфигурационном файле для пользователя.
+
+    Аргументы:
+        state (str): Имя параметра.
+        addresat (Addresat): Объект пользователя.
+        value (str): Новое значение.
+    """
     yaml = ruamel.yaml.YAML()
     with open(globals.CONFIG_FILE) as f:
         config = yaml.load(f)
@@ -170,12 +265,22 @@ def set_state(state, addresat, value):
     elif state == 'await_time':
         config['await_time'] = int(value)
     else:
-        raise Exception("Bad command!")
+        raise Exception("Bad command! ")
 
     with open(globals.CONFIG_FILE, 'w') as f:
         yaml.dump(config, f)
 
 def get_state(state, addresat):
+    """
+    Получает значение параметра из конфигурационного файла для пользователя.
+
+    Аргументы:
+        state (str): Имя параметра.
+        addresat (Addresat): Объект пользователя.
+
+    Возвращает:
+        любое: Значение параметра.
+    """
     yaml = ruamel.yaml.YAML()
     with open(globals.CONFIG_FILE) as f:
         config = yaml.load(f)
@@ -198,12 +303,44 @@ def get_state(state, addresat):
         raise Exception("Bad command!")
 
 def is_ip(address):
+    """
+    Проверяет, является ли адрес IP-адресом.
+
+    Аргументы:
+        address (str): Адрес для проверки.
+
+    Возвращает:
+        bool: True, если это IP.
+    """
     return address.replace('.', '').isnumeric()
 
 def is_registered(domain_name):
+    """
+    Проверяет, зарегистрировано ли доменное имя (наличие точки).
+
+    Аргументы:
+        domain_name (str): Домен для проверки.
+
+    Возвращает:
+        bool: True, если домен зарегистрирован.
+    """
     return '.' in domain_name
 
 def add_host(_host, _name, _stop_after, _notify, _priority, method):
+    """
+    Добавляет новый хост в конфигурацию.
+
+    Аргументы:
+        _host (str): Адрес хоста.
+        _name (str): Имя хоста.
+        _stop_after (str): Флаг остановки после падения.
+        _notify (str): Флаг уведомления.
+        _priority (str): Приоритет хоста.
+        method (str): Метод проверки (ping или curl).
+
+    Исключения:
+        Exception: Если значения параметров некорректны.
+    """
     yaml = ruamel.yaml.YAML()
     with open(globals.CONFIG_FILE) as f:
         config = yaml.load(f)
@@ -239,6 +376,16 @@ def add_host(_host, _name, _stop_after, _notify, _priority, method):
         yaml.dump(config, f)
 
 def rm_host(host_name, method):
+    """
+    Удаляет хост из конфигурации по имени.
+
+    Аргументы:
+        host_name (str): Адрес хоста.
+        method (str): Метод проверки.
+
+    Исключения:
+        Exception: Если хост не найден.
+    """
     yaml = ruamel.yaml.YAML()
     with open(globals.CONFIG_FILE) as f:
         config = yaml.load(f)
@@ -258,6 +405,16 @@ def rm_host(host_name, method):
         yaml.dump(config, f)
 
 def host_list(method, falls_cnt_filter = 0):
+    """
+    Возвращает строку с информацией о хостах для указанного метода.
+
+    Аргументы:
+        method (str): Метод (ping или curl).
+        falls_cnt_filter (int): Минимальное количество падений для отображения.
+
+    Возвращает:
+        str: Список хостов.
+    """
     response = []
 
     if method == 'ping':
@@ -283,6 +440,15 @@ def host_list(method, falls_cnt_filter = 0):
     return _response
 
 def validate_user(addresat):
+    """
+    Проверяет, есть ли пользователь в конфигурации.
+
+    Аргументы:
+        addresat (Addresat): Проверяемый пользователь.
+
+    Возвращает:
+        bool: True, если пользователь найден.
+    """
     yaml = ruamel.yaml.YAML()
     with open(globals.CONFIG_FILE) as f:
         config = yaml.load(f)

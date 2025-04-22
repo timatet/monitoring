@@ -27,7 +27,11 @@ Use the following commands to view the set values:
 
 @globals.TELEBOT.message_handler(commands=['help'])
 def help(message):
-
+    """
+    Обрабатывает команду /help.<br>
+    Если пользователь не авторизован, отправляет сообщение об этом.<br>
+    В противном случае отправляет сообщение с помощью команд.
+    """
     if configs.validate_user(message.from_user) == False:
         globals.TELEBOT.reply_to(message, 'User is not authorized')
         return
@@ -39,7 +43,11 @@ def help(message):
 
 @globals.TELEBOT.message_handler(commands=['set'])
 def set(message):
-
+    """
+    Обрабатывает команду /set.<br>
+    Если пользователь не авторизован, отправляет сообщение об этом.<br>
+    В противном случае обрабатывает команду и отправляет ответ.
+    """
     if configs.validate_user(message.from_user) == False:
         globals.TELEBOT.reply_to(message, 'User is not authorized')
         return
@@ -57,7 +65,11 @@ def set(message):
 
 @globals.TELEBOT.message_handler(commands=['get'])
 def get(message):
-
+    """
+    Обрабатывает команду /get.<br>
+    Если пользователь не авторизован, отправляет сообщение об этом.<br>
+    В противном случае обрабатывает команду и отправляет ответ.
+    """
     if configs.validate_user(message.from_user) == False:
         globals.TELEBOT.reply_to(message, 'User is not authorized')
         return
@@ -75,7 +87,11 @@ def get(message):
 
 @globals.TELEBOT.message_handler(commands=['add'])
 def add(message):
-
+    """
+    Обрабатывает команду /add.<br>
+    Если пользователь не авторизован, отправляет сообщение об этом.<br>
+    В противном случае обрабатывает команду и отправляет ответ.
+    """
     if configs.validate_user(message.from_user) == False:
         globals.TELEBOT.reply_to(message, 'User is not authorized in config')
         return
@@ -103,7 +119,11 @@ def add(message):
 
 @globals.TELEBOT.message_handler(commands=['rm'])
 def rm(message):
-
+    """
+    Обрабатывает команду /rm.<br>
+    Если пользователь не авторизован, отправляет сообщение об этом.<br>
+    В противном случае обрабатывает команду и отправляет ответ.
+    """
     if configs.validate_user(message.from_user) == False:
         globals.TELEBOT.reply_to(message, 'User is not authorized in config')
         return
@@ -127,7 +147,11 @@ def rm(message):
 
 @globals.TELEBOT.message_handler(commands=['list'])
 def list(message):
-
+    """
+    Обрабатывает команду /list.<br>
+    Если пользователь не авторизован, отправляет сообщение об этом.<br>
+    В противном случае обрабатывает команду и отправляет ответ.
+    """
     if configs.validate_user(message.from_user) == False:
         globals.TELEBOT.reply_to(message, 'User is not authorized in config')
         return
@@ -161,7 +185,11 @@ def list(message):
 
 @globals.TELEBOT.message_handler(commands=['version'])
 def list(message):
-
+    """
+    Обрабатывает команду /version.<br>
+    Если пользователь не авторизован, отправляет сообщение об этом.<br>
+    В противном случае отправляет текущую версию.
+    """
     if configs.validate_user(message.from_user) == False:
         globals.TELEBOT.reply_to(message, 'User is not authorized in config')
         return
@@ -175,6 +203,9 @@ def list(message):
         globals.TELEBOT.reply_to(message, e)
 
 def poll_tg_bot():
+    """
+    Бесконечно опрашивает бота.
+    """
     while True:
         try:
             globals.TELEBOT.polling(non_stop=True, interval=0)

@@ -3,6 +3,12 @@ import socket
 import globals
 
 def check_telebot():
+   """
+   Проверяет подключение к Telegram Bot API.
+
+   Возвращает:
+         int: 0, если подключение успешно, 1 в противном случае.
+   """
    try:
       me = globals.TELEBOT.get_me()
       return 0
