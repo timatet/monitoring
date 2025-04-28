@@ -10,6 +10,7 @@ def configure_logger() :
     '''
     Reconfiguration of the logger to make up-to-date parameters.
     '''
+    logging.info(f'Daily logger reconfiguration - {globals.LOG_DIRECTORY}/monitoring-{CURRENT_DATA}.log')
     if not os.path.exists(globals.LOG_DIRECTORY):
         os.makedirs(globals.LOG_DIRECTORY)
     logging.basicConfig(
@@ -24,6 +25,7 @@ def configure_logger() :
 def check_dates() :
     global CURRENT_DATA
     last_data = time.strftime(TIME_STYLE)
+    print(f'Checking dates {CURRENT_DATA} != {last_data}?')
     if CURRENT_DATA != last_data:
         CURRENT_DATA = last_data
         configure_logger()
