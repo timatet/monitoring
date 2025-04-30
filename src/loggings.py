@@ -6,31 +6,25 @@ from datetime import date
 def current_date():
     return date.today().strftime("%Y-%m-%d")
 
-CURRENT_DATA = current_date()
+def get_logging_file():
+    return f'{globals.LOG_DIRECTORY}/monitoring-{current_date()}.log'
 
 def configure_logger() :
     '''
     Reconfiguration of the logger to make up-to-date parameters.
     '''
-    logging.info(f'Daily logger reconfiguration - {globals.LOG_DIRECTORY}/monitoring-{CURRENT_DATA}.log')
+    _current_date = current_date()
+    logging.info(f'Daily logger reconfiguration - {get_logging_file()}')
     if not os.path.exists(globals.LOG_DIRECTORY):
         os.makedirs(globals.LOG_DIRECTORY)
     logging.basicConfig(
-        filename=f'{globals.LOG_DIRECTORY}/monitoring-{CURRENT_DATA}.log',
+        filename=get_logging_file(),
         filemode='a',
         format='%(asctime)s %(levelname)s\t:: %(message)s',
         datefmt='%m/%d/%Y %I:%M:%S%p',
         level=logging.DEBUG,
         force=True
     )
-
-def check_dates() :
-    global CURRENT_DATA
-    _current_date = current_date()
-    print(f'Checking dates {CURRENT_DATA} != {_current_date}?')
-    if CURRENT_DATA != _current_date:
-        CURRENT_DATA = _current_date
-        configure_logger()
 
 def error(log_msg):
     logging.error(log_msg)

@@ -94,7 +94,7 @@ def send_log() :
     loggings.info('Every day log sending begin...')
     for addresat in configs.ADDRESATES:
         if addresat.send_log_every_day:
-            globals.TELEBOT.send_document(addresat.id, open(f'{globals.LOG_DIRECTORY}/monitoring-{loggings.CURRENT_DATA}.log', 'rb'), caption = 'Sending logs for the past day')
+            globals.TELEBOT.send_document(addresat.id, open(loggings.get_logging_file(), 'rb'), caption = 'Sending logs for the past day')
     loggings.info('Every day log sending ended.')
 
 schedule.every(1).day.at('23:59').do(send_log)
