@@ -1,10 +1,12 @@
 import os
 import logging
 import globals
-import time
+from datetime import date
 
-TIME_STYLE = "%Y-%m-%d"
-CURRENT_DATA = time.strftime(TIME_STYLE)
+def current_date():
+    return date.today().strftime("%Y-%m-%d")
+
+CURRENT_DATA = current_date()
 
 def configure_logger() :
     '''
@@ -24,10 +26,10 @@ def configure_logger() :
 
 def check_dates() :
     global CURRENT_DATA
-    last_data = time.strftime(TIME_STYLE)
-    print(f'Checking dates {CURRENT_DATA} != {last_data}?')
-    if CURRENT_DATA != last_data:
-        CURRENT_DATA = last_data
+    _current_date = current_date()
+    print(f'Checking dates {CURRENT_DATA} != {_current_date}?')
+    if CURRENT_DATA != _current_date:
+        CURRENT_DATA = _current_date
         configure_logger()
 
 def error(log_msg):
